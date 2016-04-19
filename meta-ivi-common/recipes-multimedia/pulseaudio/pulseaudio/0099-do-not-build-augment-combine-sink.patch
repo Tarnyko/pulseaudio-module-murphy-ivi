@@ -1,0 +1,59 @@
+--- a/src/Makefile.am	2015-02-12 14:10:35.000000000 +0000
++++ b/src/Makefile.am	2016-04-19 10:16:54.855484840 +0000
+@@ -1156,7 +1156,6 @@
+ 		module-native-protocol-tcp.la \
+ 		module-native-protocol-fd.la \
+ 		module-combine.la \
+-		module-combine-sink.la \
+ 		module-remap-sink.la \
+ 		module-remap-source.la \
+ 		module-ladspa-sink.la \
+@@ -1165,7 +1164,6 @@
+ 		module-tunnel-sink.la \
+ 		module-tunnel-source.la \
+ 		module-position-event-sounds.la \
+-		module-augment-properties.la \
+ 		module-role-cork.la \
+ 		module-loopback.la \
+ 		module-virtual-sink.la \
+@@ -1441,7 +1439,6 @@
+ 		module-native-protocol-fd-symdef.h \
+ 		module-sine-symdef.h \
+ 		module-combine-symdef.h \
+-		module-combine-sink-symdef.h \
+ 		module-remap-sink-symdef.h \
+ 		module-remap-source-symdef.h \
+ 		module-ladspa-sink-symdef.h \
+@@ -1506,7 +1503,6 @@
+ 		module-gconf-symdef.h \
+ 		module-position-event-sounds-symdef.h \
+ 		module-role-ducking-symdef.h \
+-		module-augment-properties-symdef.h \
+ 		module-role-cork-symdef.h \
+ 		module-console-kit-symdef.h \
+ 		module-dbus-protocol-symdef.h \
+@@ -1674,10 +1670,6 @@
+ module_combine_la_LDFLAGS = $(MODULE_LDFLAGS)
+ module_combine_la_LIBADD = $(MODULE_LIBADD)
+ 
+-module_combine_sink_la_SOURCES = modules/module-combine-sink.c
+-module_combine_sink_la_LDFLAGS = $(MODULE_LDFLAGS)
+-module_combine_sink_la_LIBADD = $(MODULE_LIBADD)
+-
+ module_switch_on_connect_la_SOURCES = modules/module-switch-on-connect.c
+ module_switch_on_connect_la_LDFLAGS = $(MODULE_LDFLAGS)
+ module_switch_on_connect_la_LIBADD = $(MODULE_LIBADD)
+@@ -1921,13 +1913,6 @@
+ module_role_ducking_la_LIBADD = $(MODULE_LIBADD)
+ module_role_ducking_la_CFLAGS = $(AM_CFLAGS)
+ 
+-# Augment properties from XDG .desktop files
+-module_augment_properties_la_SOURCES = modules/module-augment-properties.c
+-module_augment_properties_la_LDFLAGS = $(MODULE_LDFLAGS)
+-module_augment_properties_la_LIBADD = $(MODULE_LIBADD)
+-#module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"$(datadir)/applications\"
+-module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"/usr/share/applications\"
+-
+ # Cork certain streams while others are active (e.g. cork music when phone streams appear)
+ module_role_cork_la_SOURCES = modules/module-role-cork.c
+ module_role_cork_la_LDFLAGS = $(MODULE_LDFLAGS)

@@ -1,0 +1,12 @@
+diff --git a/configure.ac b/configure.ac
+index e42a969..a5d177e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -172,6 +172,7 @@ else
+     PKG_CHECK_MODULES(LUA, $with_lua >= 5.1.1)
+ fi
+ 
++LUA_LIBS="$LUA_LIBS -lm -ldl"
+ AC_SUBST(LUA_CFLAGS)
+ AC_SUBST(LUA_LIBS)
+ 

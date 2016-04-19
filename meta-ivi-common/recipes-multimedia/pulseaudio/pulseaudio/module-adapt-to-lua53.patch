@@ -1,0 +1,94 @@
+diff --git a/murphy/scripting.c b/murphy/scripting.c
+index aea4666..a270eb9 100644
+--- a/murphy/scripting.c
++++ b/murphy/scripting.c
+@@ -576,7 +576,7 @@ static int import_create(lua_State *L)
+         case TABLE:      table = luaL_checkstring(L, -1);                break;
+         case COLUMNS:    columns = mrp_lua_check_strarray(L, -1);        break;
+         case CONDITION:  condition = luaL_checkstring(L, -1);            break;
+-        case MAXROW:     maxrow = luaL_checkint(L, -1);                  break;
++        case MAXROW:     maxrow = luaL_checkinteger(L, -1);                  break;
+         case UPDATE:     update = mrp_funcbridge_create_luafunc(L, -1);  break;
+         default:         luaL_error(L, "bad field '%s'", fldnam);        break;
+         }
+@@ -714,7 +714,7 @@ static int import_link(lua_State *L)
+     MRP_LUA_ENTER;
+ 
+     imp = (scripting_import *)mrp_lua_check_object(L, IMPORT_CLASS, 1);
+-    rowidx = luaL_checkint(L, 2) - 1;
++    rowidx = luaL_checkinteger(L, 2) - 1;
+     colnam = luaL_checkstring(L, 3);
+ 
+     pa_assert(imp);
+@@ -897,7 +897,7 @@ static void array_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, array_overrides, 0);
++    luaL_setfuncs(L, array_overrides, 0);
+ }
+ 
+ 
+@@ -1408,7 +1408,7 @@ static int rtgroup_create(lua_State *L)
+ 
+         switch (field_name_to_type(fldnam, fldnamlen)) {
+         case NAME:      name    = luaL_checkstring(L, -1);               break;
+-        case NODE_TYPE: type    = luaL_checkint(L, -1);                  break;
++        case NODE_TYPE: type    = luaL_checkinteger(L, -1);                  break;
+         case ACCEPT:    accept  = mrp_funcbridge_create_luafunc(L, -1);  break;
+         case COMPARE:   compare = mrp_funcbridge_create_luafunc(L, -1);  break;
+         default:        luaL_error(L, "bad field '%s'", fldnam);         break;
+@@ -1764,8 +1764,8 @@ static int apclass_create(lua_State *L)
+ 
+         switch (field_name_to_type(fldnam, fldnamlen)) {
+         case CLASS:       class = luaL_checkstring(L, -1);             break;
+-        case NODE_TYPE:   type = luaL_checkint(L, -1);                 break;
+-        case PRIORITY:    priority = luaL_checkint(L, -1);             break;
++        case NODE_TYPE:   type = luaL_checkinteger(L, -1);                 break;
++        case PRIORITY:    priority = luaL_checkinteger(L, -1);             break;
+         case ROUTE:       route = route_check(L, -1);                  break;
+         case ROLES:       roles = map_check(L, -1);                    break;
+         case BINARIES:    binaries = map_check(L, -1);                 break;
+@@ -2132,7 +2132,7 @@ static int vollim_create(lua_State *L)
+ 
+         switch (field_name_to_type(fldnam, fldnamlen)) {
+         case NAME:      name      = luaL_checkstring(L, -1);             break;
+-        case TYPE:      type      = luaL_checkint(L, -1);                break;
++        case TYPE:      type      = luaL_checkinteger(L, -1);                break;
+         case NODE_TYPE: classes = intarray_check(L, -1, min, max);       break;
+         case LIMIT:     limit     = limit_data_check(L, -1);             break;
+         case CALCULATE: calculate = mrp_funcbridge_create_luafunc(L,-1); break;
+@@ -2518,7 +2518,7 @@ static intarray_t *intarray_check(lua_State *L, int idx, int min, int max)
+             lua_pushnumber(L, (int)(i+1));
+             lua_gettable(L, idx);
+ 
+-            val = luaL_checkint(L, -1);
++            val = luaL_checkinteger(L, -1);
+ 
+             lua_pop(L, 1);
+ 
+@@ -2633,12 +2633,12 @@ static attribute_t *attributes_check(lua_State *L, int tbl)
+ 
+             switch (i) {
+             case 0:  attr->prop = pa_xstrdup(luaL_checkstring(L,-1));    break;
+-            case 1:  attr->def.type = luaL_checkint(L,-1);               break;
++            case 1:  attr->def.type = luaL_checkinteger(L,-1);               break;
+             case 2:
+                 switch (attr->def.type) {
+                 case mqi_string:   v->string = luaL_checkstring(L,-1);   break;
+-                case mqi_integer:  v->integer = luaL_checkint(L,-1);     break;
+-                case mqi_unsignd:  v->integer = luaL_checkint(L,-1);     break;
++                case mqi_integer:  v->integer = luaL_checkinteger(L,-1);     break;
++                case mqi_unsignd:  v->integer = luaL_checkinteger(L,-1);     break;
+                 case mqi_floating: v->floating = luaL_checknumber(L,-1); break;
+                 default:           memset(v, 0, sizeof(*v));             break;
+                 }
+@@ -2729,7 +2729,7 @@ static map_t *map_check(lua_State *L, int tbl)
+                 lua_gettable(L, def);
+ 
+                 if (i == 1) {
+-                    priority = luaL_checkint(L, -1);
++                    priority = luaL_checkinteger(L, -1);
+ 
+                     if (priority < 0 || priority > 7) {
+                         luaL_error(L, "invalid priority %d for '%s'",

@@ -12,6 +12,7 @@ SRC_URI += " \
              file://0030-volume-api-Add-libvolume-api.patch \
              file://0031-Add-module-main-volume-policy.patch \
              file://0039-main-volume-policy-adapt-to-pa6rev.patch \
+             file://0099-do-not-build-augment-combine-sink.patch \
            "
 
 PACKAGES =+ " pulseaudio-module-dev"

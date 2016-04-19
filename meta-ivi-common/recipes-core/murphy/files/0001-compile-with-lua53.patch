@@ -1,0 +1,158 @@
+diff --git a/src/core/lua-bindings/lua-murphy.c b/src/core/lua-bindings/lua-murphy.c
+index 3c665f7..8584049 100644
+--- a/src/core/lua-bindings/lua-murphy.c
++++ b/src/core/lua-bindings/lua-murphy.c
+@@ -78,7 +78,10 @@ static int register_murphy(mrp_context_t *ctx)
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);
+ 
+-    luaL_openlib(L, "murphy", functions, 0);
++    lua_newtable(L);
++    luaL_setfuncs(L, functions, 0);
++    lua_pushvalue(L, -1);
++    lua_setglobal(L, "murphy");
+ 
+     return TRUE;
+ }
+diff --git a/src/core/lua-decision/element.c b/src/core/lua-decision/element.c
+index ab85f87..d1d3609 100644
+--- a/src/core/lua-decision/element.c
++++ b/src/core/lua-decision/element.c
+@@ -915,7 +915,7 @@ static void element_input_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, element_input_overrides, 0);
++    luaL_setfuncs(L, element_input_overrides, 0);
+ }
+ 
+ static int element_input_create_luatbl(lua_State *L, int el)
+diff --git a/src/core/lua-decision/mdb.c b/src/core/lua-decision/mdb.c
+index 378a791..d60a620 100644
+--- a/src/core/lua-decision/mdb.c
++++ b/src/core/lua-decision/mdb.c
+@@ -760,7 +760,7 @@ static void table_row_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, table_row_overrides, 0);
++    luaL_setfuncs(L, table_row_overrides, 0);
+ }
+ 
+ #if 0
+@@ -1206,7 +1206,7 @@ static void select_row_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, select_row_overrides, 0);
++    luaL_setfuncs(L, select_row_overrides, 0);
+ }
+ 
+ #if 0
+diff --git a/src/core/lua-utils/funcbridge.c b/src/core/lua-utils/funcbridge.c
+index 0e594c4..d91e50e 100644
+--- a/src/core/lua-utils/funcbridge.c
++++ b/src/core/lua-utils/funcbridge.c
+@@ -88,10 +88,13 @@ void mrp_create_funcbridge_class(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, override_methods, 0);
++    luaL_setfuncs(L, override_methods, 0);
+     lua_pop(L, 1);
+ 
+-    luaL_openlib(L, "builtin.method", class_methods, 0);
++    lua_newtable(L);
++    luaL_setfuncs(L, class_methods, 0);
++    lua_pushvalue(L, -1);
++    lua_setglobal(L, "builtin.method");
+     lua_pushvalue(L, -2);
+     lua_setmetatable(L, -2);
+     lua_pop(L, 1);
+@@ -119,7 +122,7 @@ void mrp_create_funcarray_class(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, override_methods, 0);
++    luaL_setfuncs(L, override_methods, 0);
+     lua_pop(L, 1);
+ }
+ 
+diff --git a/src/core/lua-utils/object.c b/src/core/lua-utils/object.c
+index c0bc029..a8fad99 100644
+--- a/src/core/lua-utils/object.c
++++ b/src/core/lua-utils/object.c
+@@ -287,7 +287,10 @@ int mrp_lua_create_object_class(lua_State *L, mrp_lua_classdef_t *def)
+     mrp_list_init(&def->objects);
+ 
+     /* make the class table */
+-    luaL_openlib(L, def->constructor, def->methods, 0);
++    lua_newtable(L);
++    luaL_setfuncs(L, def->methods, 0);
++    lua_pushvalue(L, -1);
++    lua_setglobal(L, def->constructor);
+ 
+     /* make a metatable for class, ie. for LUA part of object instances */
+     luaL_newmetatable(L, def->class_id);
+@@ -309,7 +312,7 @@ int mrp_lua_create_object_class(lua_State *L, mrp_lua_classdef_t *def)
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+ 
+-    luaL_openlib(L, NULL, def->overrides, 0);
++    luaL_setfuncs(L, def->overrides, 0);
+     lua_setmetatable(L, -2);
+ 
+     lua_pop(L, 1);
+@@ -665,7 +668,7 @@ void *mrp_lua_create_object(lua_State *L, mrp_lua_classdef_t *def,
+ 
+     lua_createtable(L, 1, 1);
+ 
+-    luaL_openlib(L, NULL, def->methods, 0);
++    luaL_setfuncs(L, def->methods, 0);
+ 
+     luaL_getmetatable(L, def->class_id);
+     lua_setmetatable(L, -2);
+@@ -1048,7 +1051,7 @@ int mrp_lua_push_object(lua_State *L, void *data)
+     else {
+         lua_createtable(L, 1, 1);
+ 
+-        luaL_openlib(L, NULL, def->methods, 0);
++        luaL_setfuncs(L, def->methods, 0);
+ 
+         luaL_getmetatable(L, def->class_id);
+         lua_setmetatable(L, -2);
+diff --git a/src/resource/config-lua.c b/src/resource/config-lua.c
+index af6b94b..86a0497 100644
+--- a/src/resource/config-lua.c
++++ b/src/resource/config-lua.c
+@@ -434,7 +434,7 @@ static void attributes_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, attributes_overrides, 0);
++    luaL_setfuncs(L, attributes_overrides, 0);
+ }
+ 
+ static void appclass_class_create(lua_State *L)
+@@ -481,7 +481,7 @@ static void resource_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, resource_overrides, 0);
++    luaL_setfuncs(L, resource_overrides, 0);
+ }
+ 
+ static void resource_methods_create(lua_State *L)
+diff --git a/src/resource/resource-lua.c b/src/resource/resource-lua.c
+index 3b5b9df..c378362 100644
+--- a/src/resource/resource-lua.c
++++ b/src/resource/resource-lua.c
+@@ -292,7 +292,7 @@ static void ownerref_class_create(lua_State *L)
+     lua_pushliteral(L, "__index");
+     lua_pushvalue(L, -2);
+     lua_settable(L, -3);        /* metatable.__index = metatable */
+-    luaL_openlib(L, NULL, ownerref_overrides, 0);
++    luaL_setfuncs(L, ownerref_overrides, 0);
+     lua_pop(L, 1);
+ }
+ 
