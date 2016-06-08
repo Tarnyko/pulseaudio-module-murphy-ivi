@@ -15,5 +15,6 @@ RDEPENDS_${PN} += "\
     alsa-lib \
     alsa-utils \
     pulseaudio-server \
+    pulseaudio-sample-policy-plugin \
     gstreamer1.0-meta-base \
     "
